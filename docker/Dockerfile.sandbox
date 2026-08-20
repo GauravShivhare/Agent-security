@@ -1,0 +1,20 @@
+# AgentSec Sandbox Dockerfile
+# Used for isolated agent execution during security testing
+
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -u 1000 agentsec && \
+    mkdir -p /workspace && \
+    chown -R agentsec:agentsec /workspace
+
+WORKDIR /workspace
+USER agentsec
+
+# Default command
+CMD ["python3", "--version"]
