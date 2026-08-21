@@ -200,6 +200,8 @@ The auto-fix engine analyzes findings and provides:
 - **Session isolation & context limits** for memory attacks
 - **File-specific code examples** with before/after patterns
 
+![Auto-Fix Workflow](assets/autofix.png)
+
 ## 📋 Compliance Reports
 
 Generate auditor-ready compliance reports:
@@ -219,6 +221,8 @@ Supported frameworks:
 - **OWASP Top 10 for LLM** — LLM01, LLM02, LLM06, LLM07
 
 Output includes executive summary, control violation tables, and remediation references.
+
+![Compliance Dashboard](assets/compliance.png)
 
 ## 🤖 Agent-First Design (AGENTS.md + Skills)
 
@@ -242,6 +246,8 @@ Also includes `AGENTS.md` with:
 - Adapter development guide
 - Project layout reference
 
+![Agent-First Integration](assets/agent-first.png)
+
 ## 📁 Run Artifacts
 
 Every scan creates an organized artifact directory:
@@ -260,6 +266,8 @@ agentsec_runs/
 ```
 
 Access latest run artifacts with `agentsec_runs/latest/`.
+
+![Run Artifacts Structure](assets/artifacts.png)
 
 ## 🏗️ Project Structure
 
