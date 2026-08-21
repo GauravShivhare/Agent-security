@@ -34,12 +34,46 @@ llm = [
     "openai>=1.10",
     "anthropic>=0.20",
 ]
+langchain = [
+    "langchain>=0.1",
+    "langchain-core>=0.1",
+]
+langgraph = [
+    "langgraph>=0.1",
+    "langchain-core>=0.1",
+]
+autogen = [
+    "pyautogen>=0.2",
+]
+crewai = [
+    "crewai>=0.1",
+]
+http = [
+    "httpx>=0.25",
+]
+all = [
+    "httpx>=0.25",
+    "langchain>=0.1",
+    "langchain-core>=0.1",
+    "langgraph>=0.1",
+    "pyautogen>=0.2",
+    "crewai>=0.1",
+    "mcp>=1.0",
+    "openai>=1.10",
+    "anthropic>=0.20",
+]
 
 [project.entry-points."console_scripts"]
 agentsec = "agentsec.cli:main"
 
 [project.entry-points."agentsec.adapters"]
 custom = "agentsec.adapters.custom:CustomAdapter"
+http = "agentsec.adapters.http:HttpAdapter"
+langchain = "agentsec.adapters.langchain:LangChainAdapter"
+langgraph = "agentsec.adapters.langgraph:LangGraphAdapter"
+autogen = "agentsec.adapters.autogen:AutoGenAdapter"
+crewai = "agentsec.adapters.crewai:CrewAIAdapter"
+mcp = "agentsec.adapters.mcp:MCPAdapter"
 
 [project.urls]
 Homepage = "https://github.com/GauravShivhare/Agent-security"
