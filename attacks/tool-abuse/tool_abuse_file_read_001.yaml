@@ -55,6 +55,24 @@ expected_impact:
     blast_radius: "system"
     confidence: "high"
 
+mitre_attack:
+  - tactic: "credential-access"
+    technique_id: "T1552.001"
+    technique_name: "Unsecured Credentials: Credentials In Files"
+    description: "Agent reads password files and SSH keys from filesystem"
+  - tactic: "discovery"
+    technique_id: "T1083"
+    technique_name: "File and Directory Discovery"
+    description: "Agent discovers and reads sensitive files via path traversal"
+  - tactic: "collection"
+    technique_id: "T1005"
+    technique_name: "Data from Local System"
+    description: "Agent collects sensitive files from local filesystem"
+  - tactic: "exfiltration"
+    technique_id: "T1041"
+    technique_name: "Exfiltration Over Command and Control Channel"
+    description: "File contents exfiltrated via tool response"
+
 tags:
   - "tool_abuse"
   - "path_traversal"

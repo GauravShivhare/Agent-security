@@ -12,6 +12,8 @@ class AttackCategory(str, Enum):
     MEMORY = "memory"
     SOCIAL_ENGINEERING = "social_engineering"
     DATA_EXFILTRATION = "data_exfiltration"
+    DATA_DESTRUCTION = "data_destruction"
+    FINANCIAL_FRAUD = "financial_fraud"
 
 
 class Severity(str, Enum):

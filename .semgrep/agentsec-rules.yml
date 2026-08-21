@@ -1,0 +1,229 @@
+rules:
+  # ──────────────────────────────────────────────────────────────────────────────
+  # AgentSec Custom Security Rules
+  # These are repo-specific invariants that must never be violated
+  # ──────────────────────────────────────────────────────────────────────────────
+
+  - id: agentsec-no-hardcoded-llm-key
+    message: "Hardcoded LLM API key detected - use environment variables"
+    languages: [python, yaml]
+    severity: ERROR
+    pattern-either:
+      - pattern: |
+          LLM_API_KEY = "..."
+      - pattern: |
+          api_key = "..."
+      - pattern: |
+          OPENAI_API_KEY = "..."
+      - pattern: |
+          ANTHROPIC_API_KEY = "..."
+
+  - id: agentsec-no-hardcoded-secrets
+    message: "Hardcoded secret detected - use secrets manager"
+    languages: [python, yaml]
+    severity: ERROR
+    pattern-either:
+      - pattern: |
+          password = "..."
+      - pattern: |
+          secret = "..."
+      - pattern: |
+          token = "..."
+      - pattern: |
+          DATABASE_URL = "postgres://..."
+      - pattern: |
+          REDIS_URL = "redis://..."
+
+  - id: agentsec-no-unverified-tool-call
+    message: "Tool call without argument validation - add schema validation"
+    languages: [python]
+    severity: ERROR
+    pattern-either:
+      - pattern: |
+          $TOOL($ARGS)
+      - pattern: |
+          agent.call_tool($TOOL, $ARGS)
+
+  - id: agentsec-no-raw-env-access
+    message: "Direct environment variable access - use secrets manager"
+    languages: [python]
+    severity: ERROR
+    pattern: |
+      os.environ[...]
+
+  - id: agentsec-no-debug-logging-secrets
+    message: "Debug logging may expose secrets - use redacted logging"
+    languages: [python]
+    severity: ERROR
+    pattern-either:
+      - pattern: |
+          logger.debug(f"...{os.environ[...]}...")
+      - pattern: |
+          print(f"...{os.environ[...]}...")
+
+  # ──────────────────────────────────────────────────────────────────────────────
+  # Attack Definition Validation
+  # ──────────────────────────────────────────────────────────────────────────────
+
+  - id: agentsec-attack-missing-mitre
+    message: "Attack definition missing MITRE ATT&CK mapping"
+    languages: [yaml]
+    severity: WARNING
+    pattern:
+      not:
+        pattern: |
+          mitre_attack:
+    paths:
+      include:
+        - "attacks/**/*.yaml"
+
+  - id: agentsec-attack-missing-tags
+    message: "Attack definition should have descriptive tags"
+    languages: [yaml]
+    severity: WARNING
+    pattern:
+      not:
+        pattern: |
+          tags:
+    paths:
+      include:
+        - "attacks/**/*.yaml"
+
+  - id: agentsec-attack-severity-match
+    message: "Attack severity should match expected impact max_severity"
+    languages: [yaml]
+    severity: WARNING
+    pattern:
+      not:
+        pattern: |
+          severity: $SEV
+          ...
+          expected_impact:
+            max_severity: $SEV
+    paths:
+      include:
+        - "attacks/**/*.yaml"
+
+  # ──────────────────────────────────────────────────────────────────────────────
+  # Adapter Security
+  # ──────────────────────────────────────────────────────────────────────────────
+
+  - id: agentsec-adapter-no-schema-validation
+    message: "Adapter tool schema missing - add argument validation"
+    languages: [python]
+    severity: WARNING
+    pattern: |
+      def list_tools():
+        return [...]
+    metavariable-regex:
+      metavariable: $TOOLS
+      regex: "(?s).*parameters.*"
+
+  - id: agentsec-adapter-missing-reset
+    message: "Adapter missing reset function - required for test isolation"
+    languages: [python]
+    severity: WARNING
+    pattern:
+      not:
+        pattern: |
+          def reset():
+    paths:
+      include:
+        - "examples/**/*.py"
+
+  # ──────────────────────────────────────────────────────────────────────────────
+  # CI/CD Security
+  # ──────────────────────────────────────────────────────────────────────────────
+
+  - id: agentsec-ci-no-secrets-in-actions
+    message: "GitHub Actions should not contain secrets - use repository secrets"
+    languages: [yaml]
+    severity: ERROR
+    paths:
+      include:
+        - ".github/workflows/*.yml"
+        - ".github/workflows/*.yaml"
+    pattern-either:
+      - pattern: |
+          env:
+            $KEY: $VALUE
+      - pattern: |
+          ${{ secrets.$KEY }}
+
+  - id: agentsec-ci-permissions-minimal
+    message: "GitHub Actions should use minimal permissions"
+    languages: [yaml]
+    severity: WARNING
+    paths:
+      include:
+        - ".github/workflows/*.yml"
+        - ".github/workflows/*.yaml"
+    pattern:
+      not:
+        pattern: |
+          permissions:
+            contents: read
+            security-events: write
+
+  # ──────────────────────────────────────────────────────────────────────────────
+  # General Security Hygiene
+  # ──────────────────────────────────────────────────────────────────────────────
+
+  - id: agentsec-no-eval-exec
+    message: "Use of eval/exec is dangerous - avoid dynamic code execution"
+    languages: [python]
+    severity: ERROR
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)
+      - pattern: compile(...)
+
+  - id: agentsec-no-shell-injection
+    message: "Potential shell injection - use subprocess with list args"
+    languages: [python]
+    severity: ERROR
+    pattern-either:
+      - pattern: subprocess.run(..., shell=True)
+      - pattern: subprocess.Popen(..., shell=True)
+      - pattern: os.system(...)
+      - pattern: os.popen(...)
+
+  - id: agentsec-no-pickle-load
+    message: "Pickle deserialization is unsafe - use JSON"
+    languages: [python]
+    severity: ERROR
+    pattern-either:
+      - pattern: pickle.load(...)
+      - pattern: pickle.loads(...)
+      - pattern: dill.load(...)
+      - pattern: dill.loads(...)
+
+  - id: agentsec-no-yaml-unsafe-load
+    message: "YAML unsafe_load is dangerous - use safe_load"
+    languages: [python]
+    severity: ERROR
+    pattern: yaml.load(..., Loader=yaml.Loader)
+
+  - id: agentsec-no-path-traversal
+    message: "Potential path traversal - validate paths"
+    languages: [python]
+    severity: WARNING
+    pattern-either:
+      - pattern: open(..., "..." + $VAR + "...")
+      - pattern: Path(..., "..." + $VAR + "...")
+    metavariable-regex:
+      metavariable: $VAR
+      regex: ".*user.*|.*input.*|.*request.*"
+
+  - id: agentsec-no-sql-concat
+    message: "SQL string concatenation - use parameterized queries"
+    languages: [python]
+    severity: ERROR
+    pattern-either:
+      - pattern: |
+          "SELECT ... " + $VAR
+      - pattern: |
+          f"SELECT ... { $VAR }"
+    metavariable-regex:
+      metavariable: $VAR
+      regex: ".*user.*|.*input.*|.*request.*|.*param.*"

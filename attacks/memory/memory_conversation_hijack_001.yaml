@@ -47,6 +47,24 @@ expected_impact:
     blast_radius: "system"
     confidence: "medium"
 
+mitre_attack:
+  - tactic: "persistence"
+    technique_id: "T1505.003"
+    technique_name: "Server Software Component: Web Shell"
+    description: "Fake conversation history persists and affects future behavior"
+  - tactic: "privilege-escalation"
+    technique_id: "T1068"
+    technique_name: "Exploitation for Privilege Escalation"
+    description: "Conversation hijacking elevates agent privileges to admin"
+  - tactic: "defense-evasion"
+    technique_id: "T1562.001"
+    technique_name: "Impair Defenses: Disable or Modify Tools"
+    description: "Agent disables firewall and security controls based on fake history"
+  - tactic: "credential-access"
+    technique_id: "T1556.002"
+    technique_name: "Modify Authentication Process: Password Filter"
+    description: "Fake history modifies agent's authentication behavior"
+
 tags:
   - "memory"
   - "conversation_hijacking"

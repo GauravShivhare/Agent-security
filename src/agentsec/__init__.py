@@ -8,7 +8,7 @@ from agentsec.attacks import (
     AttackCategory,
     Severity,
 )
-from agentsec.config import AgentSecConfig
+from agentsec.config import AgentSecConfig, AdapterConfig, ScanConfig, EngagementConfig, ScopeConfig
 from agentsec.engine import Orchestrator, ScanConfig, ScanResult
 from agentsec.observe import EventTracer, get_tracer
 from agentsec.evaluate import SuccessEvaluator, ImpactEvaluator
@@ -25,6 +25,10 @@ __all__ = [
     "AttackCategory",
     "Severity",
     "AgentSecConfig",
+    "AdapterConfig",
+    "ScanConfig",
+    "EngagementConfig",
+    "ScopeConfig",
     "Orchestrator",
     "ScanConfig",
     "ScanResult",

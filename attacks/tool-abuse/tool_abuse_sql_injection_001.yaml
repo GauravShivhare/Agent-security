@@ -41,6 +41,24 @@ expected_impact:
     blast_radius: "database"
     confidence: "high"
 
+mitre_attack:
+  - tactic: "credential-access"
+    technique_id: "T1003"
+    technique_name: "OS Credential Dumping"
+    description: "SQL injection extracts credential hashes from database"
+  - tactic: "discovery"
+    technique_id: "T1590.005"
+    technique_name: "Active Scanning: Vulnerability Scanning"
+    description: "SQL injection discovers database schema and content"
+  - tactic: "collection"
+    technique_id: "T1213.002"
+    technique_name: "Data from Information Repositories: Email"
+    description: "SQL injection collects sensitive data from database"
+  - tactic: "impact"
+    technique_id: "T1485"
+    technique_name: "Data Destruction"
+    description: "SQL injection can drop tables or modify data"
+
 tags:
   - "tool_abuse"
   - "sql_injection"

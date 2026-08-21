@@ -41,6 +41,24 @@ expected_impact:
     blast_radius: "all_future_sessions"
     confidence: "medium"
 
+mitre_attack:
+  - tactic: "persistence"
+    technique_id: "T1505.003"
+    technique_name: "Server Software Component: Web Shell"
+    description: "Malicious instruction persists in agent memory across sessions"
+  - tactic: "persistence"
+    technique_id: "T1556.002"
+    technique_name: "Modify Authentication Process: Password Filter"
+    description: "Memory poisoning modifies agent's authentication behavior"
+  - tactic: "credential-access"
+    technique_id: "T1552.001"
+    technique_name: "Unsecured Credentials: Credentials In Files"
+    description: "Planted credentials retrieved from persistent memory"
+  - tactic: "defense-evasion"
+    technique_id: "T1562.001"
+    technique_name: "Impair Defenses: Disable or Modify Tools"
+    description: "Agent instructed to disable security controls persistently"
+
 tags:
   - "memory_poisoning"
   - "persistent_injection"

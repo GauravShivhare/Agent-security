@@ -49,6 +49,20 @@ expected_impact:
     blast_radius: "agent_configuration"
     confidence: "medium"
 
+mitre_attack:
+  - tactic: "defense-evasion"
+    technique_id: "T1562.001"
+    technique_name: "Impair Defenses: Disable or Modify Tools"
+    description: "Context overflow impairs security instructions in agent memory"
+  - tactic: "collection"
+    technique_id: "T1005"
+    technique_name: "Data from Local System"
+    description: "System prompt and internal configuration extracted from agent"
+  - tactic: "discovery"
+    technique_id: "T1590.005"
+    technique_name: "Active Scanning: Vulnerability Scanning"
+    description: "Agent configuration and security controls discovered"
+
 tags:
   - "memory"
   - "context_overflow"

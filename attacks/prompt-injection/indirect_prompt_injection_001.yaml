@@ -73,6 +73,24 @@ expected_impact:
     blast_radius: "all_customers"
     confidence: "high"
 
+mitre_attack:
+  - tactic: "initial-access"
+    technique_id: "T1566.001"
+    technique_name: "Phishing: Spearphishing Attachment"
+    description: "Malicious instructions embedded in document delivered to agent"
+  - tactic: "execution"
+    technique_id: "T1059.001"
+    technique_name: "Command and Scripting Interpreter: PowerShell"
+    description: "Agent executes unauthorized tool calls via injected instructions"
+  - tactic: "collection"
+    technique_id: "T1560.001"
+    technique_name: "Archive Collected Data: Archive via Utility"
+    description: "Customer data collected and packaged for exfiltration"
+  - tactic: "exfiltration"
+    technique_id: "T1041"
+    technique_name: "Exfiltration Over Command and Control Channel"
+    description: "Data exfiltrated via email tool to attacker-controlled domain"
+
 tags:
   - "indirect_injection"
   - "email"

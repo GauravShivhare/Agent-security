@@ -16,6 +16,43 @@ class AdapterConfig:
 
 
 @dataclass
+class ScopeConfig:
+    """Scope configuration for engagement."""
+    include: list[str] = field(default_factory=list)
+    exclude: list[str] = field(default_factory=list)
+
+
+@dataclass
+class EngagementConfig:
+    """Engagement configuration (OPPLAN-style Rules of Engagement).
+    
+    Inspired by Decepticon's engagement package: RoE, ConOps, Deconfliction Plan, OPPLAN.
+    """
+    name: str = "agentsec-assessment"
+    description: str = "AI Agent Security Assessment"
+    scope: ScopeConfig = field(default_factory=ScopeConfig)
+    rules_of_engagement: list[str] = field(default_factory=lambda: [
+        "No destructive actions (file deletion, data modification, service disruption)",
+        "No external network calls to unauthorized destinations",
+        "No credential harvesting from production systems",
+        "Respect rate limits and avoid denial of service",
+        "All findings reported with evidence and remediation",
+    ])
+    objectives: list[str] = field(default_factory=lambda: [
+        "Identify prompt injection vulnerabilities",
+        "Validate tool permission boundaries",
+        "Test secret handling and isolation",
+        "Verify memory isolation across sessions",
+    ])
+    max_requests_per_attack: int = 100
+    max_total_requests: int = 5000
+    allowed_tools: list[str] | None = None  # None = all tools allowed
+    denied_tools: list[str] = field(default_factory=list)
+    allowed_domains: list[str] = field(default_factory=list)
+    denied_domains: list[str] = field(default_factory=list)
+
+
+@dataclass
 class ScanConfig:
     """Scan configuration."""
     attack_dirs: list[str] = field(default_factory=lambda: ["attacks"])
@@ -33,6 +70,7 @@ class AgentSecConfig:
     """Main configuration."""
     target: AdapterConfig = field(default_factory=AdapterConfig)
     scan: ScanConfig = field(default_factory=ScanConfig)
+    engagement: EngagementConfig = field(default_factory=EngagementConfig)
     metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
@@ -47,10 +85,12 @@ class AgentSecConfig:
 
         target_data = data.get("target", {})
         scan_data = data.get("scan", {})
+        engagement_data = data.get("engagement", {})
 
         return cls(
             target=AdapterConfig(**target_data),
             scan=ScanConfig(**scan_data),
+            engagement=EngagementConfig(**engagement_data),
             metadata=data.get("metadata", {}),
         )
 
@@ -73,6 +113,22 @@ class AgentSecConfig:
                 "max_turns": self.scan.max_turns,
                 "sandbox": self.scan.sandbox,
                 "sandbox_image": self.scan.sandbox_image,
+            },
+            "engagement": {
+                "name": self.engagement.name,
+                "description": self.engagement.description,
+                "scope": {
+                    "include": self.engagement.scope.include,
+                    "exclude": self.engagement.scope.exclude,
+                },
+                "rules_of_engagement": self.engagement.rules_of_engagement,
+                "objectives": self.engagement.objectives,
+                "max_requests_per_attack": self.engagement.max_requests_per_attack,
+                "max_total_requests": self.engagement.max_total_requests,
+                "allowed_tools": self.engagement.allowed_tools,
+                "denied_tools": self.engagement.denied_tools,
+                "allowed_domains": self.engagement.allowed_domains,
+                "denied_domains": self.engagement.denied_domains,
             },
             "metadata": self.metadata,
         }

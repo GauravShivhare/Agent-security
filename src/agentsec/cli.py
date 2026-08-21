@@ -691,5 +691,183 @@ def compliance(report_file: Path, output: Path | None, frameworks: tuple[str], o
     console.print(f"\nOpen {out_path} for the full compliance report.")
 
 
+@main.command()
+@click.argument("target_path", type=click.Path(exists=True, path_type=Path), required=False)
+@click.option("--config", "-c", type=click.Path(path_type=Path), default="agentsec.yaml",
+              help="Path to configuration file")
+@click.option("--attacks", "-a", "attack_dirs", multiple=True, default=["attacks"],
+              help="Directories to load attacks from")
+@click.option("--fail-on", type=click.Choice(["critical", "high", "medium", "low", "info"]),
+              default="high", help="Fail on this severity or higher")
+@click.option("--max-iterations", "-i", default=3,
+              help="Maximum auto-fix iterations")
+@click.option("--output", "-o", type=click.Path(path_type=Path), default="vaccinate-report.md",
+              help="Output report file")
+@click.option("--auto-fix/--no-auto-fix", default=True,
+              help="Automatically apply suggested fixes")
+def vaccinate(
+    target_path: Path | None,
+    config: Path,
+    attack_dirs: tuple[str],
+    fail_on: str,
+    max_iterations: int,
+    output: Path,
+    auto_fix: bool,
+):
+    """Run the Offensive Vaccine cycle: attack → fix → verify → repeat.
+
+    This implements the attack → defend → verify loop inspired by Decepticon's
+    Offensive Vaccine concept. It runs a scan, generates fixes, applies them,
+    and re-scans until no critical/high findings remain or max iterations reached.
+    """
+    import json
+    import tempfile
+    import shutil
+    from agentsec.evaluate.autofix import AutoFixEngine
+    from agentsec.engine.orchestrator import Orchestrator
+    from agentsec.attacks.registry import AttackRegistry
+    from agentsec.attacks import AttackLoader
+    from agentsec.adapters.custom import CustomAdapter
+    from agentsec.config import AgentSecConfig
+    from agentsec.engine.runner import AttackRunner
+
+    console.print("[bold cyan]💉 AgentSec Offensive Vaccine[/bold cyan]")
+    console.print("Attack → Fix → Verify cycle\n")
+
+    # Load configuration
+    if config.exists():
+        cfg = AgentSecConfig.load(config)
+    else:
+        cfg = AgentSecConfig()
+
+    # Load attacks
+    registry = AttackRegistry()
+    for dir_str in attack_dirs:
+        dir_path = Path(dir_str)
+        if dir_path.exists():
+            attacks = AttackLoader.load_directory(dir_path)
+            for attack in attacks:
+                try:
+                    registry.register(attack)
+                except ValueError as e:
+                    console.print(f"[yellow]Warning: {e}[/yellow]")
+
+    if not registry:
+        console.print("[red]Error: No attacks loaded[/red]")
+        sys.exit(1)
+
+    console.print(f"[dim]Loaded {len(registry)} attacks[/dim]")
+
+    # Create target adapter (simplified for demo)
+    if target_path and target_path.name == "vulnerable_agent":
+        target = create_vulnerable_agent()
+        target_name = "vulnerable-agent"
+    else:
+        console.print("[red]Error: Vaccinate currently supports vulnerable_agent demo only[/red]")
+        console.print("Support for custom agents coming soon.")
+        sys.exit(1)
+
+    iteration_results = []
+    current_target = target
+
+    for iteration in range(1, max_iterations + 1):
+        console.print(f"\n[bold]═══ Iteration {iteration}/{max_iterations} ═══[/bold]")
+
+        # Scan
+        console.print(f"[cyan]Scanning...[/cyan]")
+        scan_config = type('ScanConfig', (), {
+            'target_name': target_name,
+            'attack_ids': None,
+            'categories': None,
+            'severities': None,
+            'fail_on': fail_on,
+            'verbose': False,
+            'output_json': None,
+            'output_sarif': None,
+            'sandbox': False,
+            'policy_dir': None,
+            'fail_on_policy': False,
+        })()
+
+        orchestrator = Orchestrator(current_target, registry, scan_config)
+        result = orchestrator.run()
+
+        # Save scan report
+        scan_report = {
+            "metadata": {"tool": "agentsec", "version": "0.1.0"},
+            "summary": result.summary,
+            "results": [r.to_dict() if hasattr(r, 'to_dict') else r for r in result.attack_results],
+        }
+
+        # Check if we should continue
+        failed_findings = [r for r in scan_report["results"] if r.get("success", False)]
+        critical_high = [f for f in failed_findings if f.get("severity") in ["critical", "high"]]
+
+        if not critical_high:
+            console.print(f"[green]✓ No critical/high findings. Vaccination complete![/green]")
+            break
+
+        console.print(f"[yellow]Found {len(critical_high)} critical/high findings[/yellow]")
+
+        # Generate fixes
+        if auto_fix:
+            console.print(f"[cyan]Generating fixes...[/cyan]")
+            engine = AutoFixEngine()
+            fix_report = engine.generate_fix_report(scan_report)
+            
+            # Save fix report for this iteration
+            fix_path = output.with_suffix(f".iter{iteration}.md")
+            fix_path.write_text(fix_report, encoding="utf-8")
+            console.print(f"[dim]Fix report saved to {fix_path}[/dim]")
+
+            # TODO: Apply fixes automatically (requires target code modification)
+            console.print(f"[yellow]Auto-fix application not yet implemented for custom targets[/yellow]")
+            console.print(f"[dim]Review {fix_path} and apply fixes manually, then re-run[/dim]")
+
+        iteration_results.append({
+            "iteration": iteration,
+            "security_score": result.summary["security_score"],
+            "critical_high_count": len(critical_high),
+            "total_findings": len(failed_findings),
+        })
+
+        if iteration == max_iterations:
+            console.print(f"[red]Max iterations reached. Manual intervention required.[/red]")
+
+    # Generate final vaccine report
+    final_report = f"""# AgentSec Vaccination Report
+
+**Target:** {target_name}
+**Iterations:** {len(iteration_results)}
+**Final Security Score:** {iteration_results[-1]['security_score'] if iteration_results else 'N/A'}/100
+
+## Iteration Summary
+
+| Iteration | Security Score | Critical/High | Total Findings |
+|-----------|----------------|---------------|----------------|
+"""
+    for r in iteration_results:
+        final_report += f"| {r['iteration']} | {r['security_score']}/100 | {r['critical_high_count']} | {r['total_findings']} |\n"
+
+    final_report += f"""
+
+## Summary
+
+{'✅ **Vaccination Successful** - No critical/high findings remain' if not critical_high else '⚠️ **Vaccination Incomplete** - Manual fixes required for remaining findings'}
+
+**Next Steps:**
+1. Review fix reports: {output.with_suffix('.iter*.md')}
+2. Apply suggested code changes
+3. Re-run `agentsec vaccinate` to verify
+
+Run `agentsec scan {target_path} --output-json report.json` for detailed scan.
+"""
+
+    output.write_text(final_report, encoding="utf-8")
+    console.print(f"\n[green]✓[/green] Vaccination report generated: {output}")
+
+    sys.exit(0 if not critical_high else 1)
+
+
 if __name__ == "__main__":
     main()
