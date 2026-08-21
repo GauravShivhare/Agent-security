@@ -6,6 +6,7 @@ from typing import Any
 
 import click
 from rich.console import Console
+from rich.table import Table
 
 from agentsec.adapters.base import AgentTarget
 from agentsec.adapters.custom import CustomAdapter
