@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentSec Architecture Diagram</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --bg-card: #0f172a;
+            --fg: #f1f5f9;
+            --muted: #64748b;
+            --accent: #22d3ee;
+            --accent-dim: #06b6d4;
+            --border: #1e293b;
+        }
+        * { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); }
+        .arrow { position: relative; }
+        .arrow::after { content: '→'; position: absolute; color: var(--accent); font-size: 1.5rem; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-slate-950 min-h-screen text-slate-100 p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 flex items-center justify-center gap-3">
+                <span class="text-cyan-400">AgentSec</span>
+                <span class="text-slate-500">Architecture</span>
+            </h1>
+            <p class="text-slate-400 max-w-2xl mx-auto">AI Agent Security Testing Framework — Pipeline & Components</p>
+        </div>
+
+        <!-- Main Pipeline -->
+        <div class="card rounded-2xl p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-6 flex items-center gap-2 text-cyan-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Main Execution Pipeline
+            </h2>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-1 flex-wrap">
+                <!-- Pipeline Steps -->
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">1</div>
+                        <div class="font-semibold">CLI Entry</div>
+                        <div class="text-slate-500 text-sm">agentsec scan</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">2</div>
+                        <div class="font-semibold">Config Loader</div>
+                        <div class="text-slate-500 text-sm">agentsec.yaml</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">3</div>
+                        <div class="font-semibold">Target Adapter</div>
+                        <div class="text-slate-500 text-sm">Custom/HTTP/LangChain/...</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors border-cyan-400/50">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">4</div>
+                        <div class="font-semibold text-cyan-400">Sandbox</div>
+                        <div class="text-slate-500 text-sm">Docker Isolation</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">5</div>
+                        <div class="font-semibold">Attack Orchestrator</div>
+                        <div class="text-slate-500 text-sm">Sequences Attacks</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">6</div>
+                        <div class="font-semibold">Attack Cases</div>
+                        <div class="text-slate-500 text-sm">13 Built-in Attacks</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">7</div>
+                        <div class="font-semibold">Agent Execution</div>
+                        <div class="text-slate-500 text-sm">Target Agent Runs</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">8</div>
+                        <div class="font-semibold">Event Tracer</div>
+                        <div class="text-slate-500 text-sm">Captures All Events</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-slate-700 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-1 flex-wrap">
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">9</div>
+                        <div class="font-semibold">Success Evaluator</div>
+                        <div class="text-slate-500 text-sm">Deterministic Checks</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">10</div>
+                        <div class="font-semibold">Impact Classifier</div>
+                        <div class="text-slate-500 text-sm">Multi-dim Scoring</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">11</div>
+                        <div class="font-semibold">Report Generator</div>
+                        <div class="text-slate-500 text-sm">JSON / SARIF / Terminal</div>
+                    </div>
+                </div>
+                <div class="arrow hidden md:block mx-2"></div>
+                <div class="pipeline-step text-center">
+                    <div class="card p-4 min-w-[160px] hover:border-cyan-400 transition-colors border-cyan-400/50">
+                        <div class="text-cyan-400 font-mono text-xs mb-1">12</div>
+                        <div class="font-semibold text-cyan-400">CI Exit Code</div>
+                        <div class="text-slate-500 text-sm">0 = Pass, 1 = Fail</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Components Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Attack Library -->
+            <div class="card rounded-2xl p-5 hover:border-cyan-400 transition-colors group">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-400/20 flex items-center justify-center group-hover:bg-cyan-400/40 transition-colors">
+                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                    <h3 class="font-semibold text-lg">Attack Library</h3>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-300">
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>13 Built-in Attacks</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>5 Categories</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>YAML/JSON Format</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>Success Conditions</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>Impact Dimensions</li>
+                </ul>
+            </div>
+
+            <!-- Adapters -->
+            <div class="card rounded-2xl p-5 hover:border-cyan-400 transition-colors group">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-purple-400/20 flex items-center justify-center group-hover:bg-purple-400/40 transition-colors">
+                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    </div>
+                    <h3 class="font-semibold text-lg">Adapters</h3>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-300">
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-400"></span>Custom (Python)</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-400"></span>HTTP/REST API</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-400"></span>LangChain</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-400"></span>LangGraph</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-400"></span>AutoGen</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-400"></span>CrewAI</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-400"></span>MCP</li>
+                </ul>
+            </div>
+
+            <!-- Policies -->
+            <div class="card rounded-2xl p-5 hover:border-cyan-400 transition-colors group">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-orange-400/20 flex items-center justify-center group-hover:bg-orange-400/40 transition-colors">
+                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <h3 class="font-semibold text-lg">Policies (OPA/Rego)</h3>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-300">
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-400"></span>Email Security</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-400"></span>Injection Prevention</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-400"></span>Secret Protection</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-400"></span>Custom Rules</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-400"></span>--fail-on-policy</li>
+                </ul>
+            </div>
+
+            <!-- Dashboard -->
+            <div class="card rounded-2xl p-5 hover:border-cyan-400 transition-colors group">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-pink-400/20 flex items-center justify-center group-hover:bg-pink-400/40 transition-colors">
+                        <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    </div>
+                    <h3 class="font-semibold text-lg">Web Dashboard</h3>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-300">
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-pink-400"></span>Security Score</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-pink-400"></span>Severity Charts</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-pink-400"></span>Findings Table</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-pink-400"></span>Evidence Drill-down</li>
+                    <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-pink-400"></span>Event Trace</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Data Flow -->
+        <div class="card rounded-2xl p-6">
+            <h2 class="text-xl font-semibold mb-6 flex items-center gap-2 text-cyan-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Data Flow & Integration Points
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-4">
+                    <h3 class="font-semibold text-cyan-400 mb-3">Inputs</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Target Agent (via Adapter)</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Attack Definitions (YAML)</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Config (agentsec.yaml)</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Policies (Rego files)</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> CLI Options</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <h3 class="font-semibold text-cyan-400 mb-3">Processing</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Sandboxed Execution</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Event Capture</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Deterministic Evaluation</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Impact Scoring</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Policy Evaluation</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <h3 class="font-semibold text-cyan-400 mb-3">Outputs</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Terminal Report (Rich)</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> JSON Report</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> SARIF (GitHub Code Scanning)</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Exit Code (CI/CD)</div>
+                        <div class="card p-3"><span class="text-cyan-400">•</span> Web Dashboard (HTML)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 pt-8 border-t border-slate-800">
+            <p class="text-slate-500">Built with <span class="text-red-400">♥</span> for AI Security</p>
+            <p class="text-slate-600 text-sm mt-1">AgentSec — Break your AI agent before a real attacker does</p>
+        </div>
+    </div>
+</body>
+</html>

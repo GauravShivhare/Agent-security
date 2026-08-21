@@ -19,6 +19,44 @@ AgentSec is an open-source defensive security-testing framework for AI agents. I
 - **Local Web Dashboard** — `agentsec serve` for interactive charts, filtering, evidence drill-down
 - **Extensible Architecture** — Clean interfaces for custom adapters and attack packs
 
+## 🏗️ Architecture
+
+```mermaid
+flowchart LR
+    subgraph Pipeline["Main Execution Pipeline"]
+        CLI["CLI Entry\nagentsec scan"]
+        Config["Config Loader\nagentsec.yaml"]
+        Adapter["Target Adapter\nCustom/HTTP/LangChain/..."]
+        Sandbox["Sandbox\nDocker Isolation"]
+        Orchestrator["Attack Orchestrator\nSequences Attacks"]
+        Attacks["Attack Cases\n13 Built-in Attacks"]
+        Agent["Agent Execution\nTarget Agent Runs"]
+        Tracer["Event Tracer\nCaptures All Events"]
+        Evaluator["Success Evaluator\nDeterministic Checks"]
+        Impact["Impact Classifier\nMulti-dim Scoring"]
+        Reports["Report Generator\nJSON/SARIF/Terminal"]
+        CI["CI Exit Code\n0=Pass 1=Fail"]
+    end
+
+    subgraph Components["Core Components"]
+        Library["Attack Library\n13 YAML Attacks\n5 Categories"]
+        Adapters["Adapters\nCustom/HTTP/LangChain/LangGraph/AutoGen/CrewAI/MCP"]
+        Policies["Policies OPA/Rego\nEmail/Injection/Secrets"]
+        Dashboard["Web Dashboard\nSecurity Score/Charts/Traces"]
+        Mutator["Mutation Engine\n50+ Variants/Attack"]
+    end
+
+    CLI --> Config --> Adapter --> Sandbox --> Orchestrator
+    Orchestrator --> Attacks --> Agent --> Tracer
+    Tracer --> Evaluator --> Impact --> Reports --> CI
+
+    Orchestrator -.-> Library
+    Adapter -.-> Adapters
+    Evaluator -.-> Policies
+    Reports -.-> Dashboard
+    Library -.-> Mutator
+```
+
 ## 🚀 Quick Start
 
 ```bash
@@ -84,12 +122,16 @@ agentsec scan examples/vulnerable_agent --output-json report.json
 agentsec serve --report report.json --no-browser
 ```
 
+![AgentSec Dashboard](docs/architecture.png)
+
 Dashboard features:
 - Summary cards (total, passed, failed, policy violations/warnings)
 - Security score with color-coded progress bar
 - Severity distribution (doughnut chart) & category breakdown (bar chart)
 - Filterable findings table with search + severity filter
 - Clickable attack detail modal with evidence, impact rationale, event trace
+
+> **Architecture Diagram**: See [docs/architecture.html](docs/architecture.html) for an interactive architecture visualization, or [docs/architecture.mermaid](docs/architecture.mermaid) for the Mermaid source.
 
 ## 🧬 Attack Mutation Engine
 

@@ -1,0 +1,236 @@
+<svg width="1200" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#020617"/>
+      <stop offset="100%" style="stop-color:#1e1b4b"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bgGrad)"/>
+  
+  <!-- Title -->
+  <text x="600" y="50" font-family="Inter, sans-serif" font-size="28" font-weight="bold" fill="#f1f5f9" text-anchor="middle">
+    <tspan fill="#22d3ee">AgentSec</tspan> Architecture
+  </text>
+  <text x="600" y="80" font-family="Inter, sans-serif" font-size="14" fill="#64748b" text-anchor="middle">
+    AI Agent Security Testing Framework — Pipeline & Components
+  </text>
+
+  <!-- Main Pipeline -->
+  <g font-family="JetBrains Mono, monospace">
+    <!-- Pipeline steps -->
+    <g transform="translate(50, 120)">
+      <rect x="0" y="0" width="160" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="80" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">1</text>
+      <text x="80" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">CLI Entry</text>
+      <text x="80" y="60" font-size="10" fill="#64748b" text-anchor="middle">agentsec scan</text>
+    </g>
+
+    <g transform="translate(230, 120)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(240, 120)">
+      <rect x="0" y="0" width="160" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="80" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">2</text>
+      <text x="80" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Config Loader</text>
+      <text x="80" y="60" font-size="10" fill="#64748b" text-anchor="middle">agentsec.yaml</text>
+    </g>
+
+    <g transform="translate(420, 120)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(430, 120)">
+      <rect x="0" y="0" width="180" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="90" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">3</text>
+      <text x="90" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Target Adapter</text>
+      <text x="90" y="60" font-size="10" fill="#64748b" text-anchor="middle">Custom/HTTP/LangChain/...</text>
+    </g>
+
+    <g transform="translate(630, 120)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(640, 120)">
+      <rect x="0" y="0" width="160" height="80" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2" filter="url(#glow)"/>
+      <text x="80" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">4</text>
+      <text x="80" y="42" font-size="12" font-weight="600" fill="#22d3ee">Sandbox</text>
+      <text x="80" y="60" font-size="10" fill="#64748b" text-anchor="middle">Docker Isolation</text>
+    </g>
+
+    <g transform="translate(820, 120)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(830, 120)">
+      <rect x="0" y="0" width="180" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="90" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">5</text>
+      <text x="90" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Attack Orchestrator</text>
+      <text x="90" y="60" font-size="10" fill="#64748b" text-anchor="middle">Sequences Attacks</text>
+    </g>
+
+    <g transform="translate(1030, 120)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(1040, 120)">
+      <rect x="0" y="0" width="160" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="80" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">6</text>
+      <text x="80" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Attack Cases</text>
+      <text x="80" y="60" font-size="10" fill="#64748b" text-anchor="middle">13 Built-in Attacks</text>
+    </g>
+  </g>
+
+  <!-- Second row -->
+  <g font-family="JetBrains Mono, monospace" transform="translate(50, 230)">
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="160" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="80" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">7</text>
+      <text x="80" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Agent Execution</text>
+      <text x="80" y="60" font-size="10" fill="#64748b" text-anchor="middle">Target Agent Runs</text>
+    </g>
+
+    <g transform="translate(180, 0)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(190, 0)">
+      <rect x="0" y="0" width="160" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="80" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">8</text>
+      <text x="80" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Event Tracer</text>
+      <text x="80" y="60" font-size="10" fill="#64748b" text-anchor="middle">Captures All Events</text>
+    </g>
+
+    <g transform="translate(370, 0)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(380, 0)">
+      <rect x="0" y="0" width="180" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="90" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">9</text>
+      <text x="90" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Success Evaluator</text>
+      <text x="90" y="60" font-size="10" fill="#64748b" text-anchor="middle">Deterministic Checks</text>
+    </g>
+
+    <g transform="translate(580, 0)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(590, 0)">
+      <rect x="0" y="0" width="180" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="90" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">10</text>
+      <text x="90" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Impact Classifier</text>
+      <text x="90" y="60" font-size="10" fill="#64748b" text-anchor="middle">Multi-dim Scoring</text>
+    </g>
+
+    <g transform="translate(790, 0)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(800, 0)">
+      <rect x="0" y="0" width="180" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <text x="90" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">11</text>
+      <text x="90" y="42" font-size="12" font-weight="600" fill="#f1f5f9" text-anchor="middle">Report Generator</text>
+      <text x="90" y="60" font-size="10" fill="#64748b" text-anchor="middle">JSON / SARIF / Terminal</text>
+    </g>
+
+    <g transform="translate(1000, 0)">
+      <polygon points="160,0 180,40 160,80 0,80 0,0" fill="#1e293b" stroke="#22d3ee" stroke-width="1"/>
+    </g>
+
+    <g transform="translate(1010, 0)">
+      <rect x="0" y="0" width="160" height="80" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2" filter="url(#glow)"/>
+      <text x="80" y="20" font-size="10" fill="#22d3ee" text-anchor="middle">12</text>
+      <text x="80" y="42" font-size="12" font-weight="600" fill="#22d3ee">CI Exit Code</text>
+      <text x="80" y="60" font-size="10" fill="#64748b" text-anchor="middle">0=Pass 1=Fail</text>
+    </g>
+  </g>
+
+  <!-- Side Components -->
+  <g font-family="Inter, sans-serif">
+    <g transform="translate(50, 340)">
+      <rect x="0" y="0" width="280" height="200" rx="12" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <g transform="translate(20, 20)">
+        <rect x="0" y="0" width="40" height="40" rx="8" fill="#22d3ee20"/>
+        <text x="20" y="28" font-size="24" fill="#22d3ee" text-anchor="middle">📚</text>
+        <text x="70" y="28" font-size="16" font-weight="600" fill="#f1f5f9">Attack Library</text>
+      </g>
+      <g transform="translate(20, 80)" font-size="13" fill="#cbd5e1">
+        <text x="0" y="0">● 13 Built-in Attacks</text>
+        <text x="0" y="25">● 5 Categories</text>
+        <text x="0" y="50">● YAML/JSON Format</text>
+        <text x="0" y="75">● Success Conditions</text>
+        <text x="0" y="100">● Impact Dimensions</text>
+      </g>
+    </g>
+
+    <g transform="translate(350, 340)">
+      <rect x="0" y="0" width="280" height="200" rx="12" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <g transform="translate(20, 20)">
+        <rect x="0" y="0" width="40" height="40" rx="8" fill="#a855f720"/>
+        <text x="20" y="28" font-size="24" fill="#a855f7" text-anchor="middle">🔌</text>
+        <text x="70" y="28" font-size="16" font-weight="600" fill="#f1f5f9">Adapters</text>
+      </g>
+      <g transform="translate(20, 80)" font-size="13" fill="#cbd5e1">
+        <text x="0" y="0">● Custom (Python)</text>
+        <text x="0" y="25">● HTTP/REST API</text>
+        <text x="0" y="50">● LangChain</text>
+        <text x="0" y="75">● LangGraph</text>
+        <text x="0" y="100">● AutoGen</text>
+        <text x="150" y="0">● CrewAI</text>
+        <text x="150" y="25">● MCP</text>
+      </g>
+    </g>
+
+    <g transform="translate(650, 340)">
+      <rect x="0" y="0" width="280" height="200" rx="12" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <g transform="translate(20, 20)">
+        <rect x="0" y="0" width="40" height="40" rx="8" fill="#fb923c20"/>
+        <text x="20" y="28" font-size="24" fill="#fb923c" text-anchor="middle">🛡️</text>
+        <text x="70" y="28" font-size="16" font-weight="600" fill="#f1f5f9">Policies (OPA/Rego)</text>
+      </g>
+      <g transform="translate(20, 80)" font-size="13" fill="#cbd5e1">
+        <text x="0" y="0">● Email Security</text>
+        <text x="0" y="25">● Injection Prevention</text>
+        <text x="0" y="50">● Secret Protection</text>
+        <text x="0" y="75">● Custom Rules</text>
+        <text x="0" y="100">● --fail-on-policy</text>
+      </g>
+    </g>
+
+    <g transform="translate(950, 340)">
+      <rect x="0" y="0" width="280" height="200" rx="12" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      <g transform="translate(20, 20)">
+        <rect x="0" y="0" width="40" height="40" rx="8" fill="#ec489920"/>
+        <text x="20" y="28" font-size="24" fill="#ec4899" text-anchor="middle">📊</text>
+        <text x="70" y="28" font-size="16" font-weight="600" fill="#f1f5f9">Web Dashboard</text>
+      </g>
+      <g transform="translate(20, 80)" font-size="13" fill="#cbd5e1">
+        <text x="0" y="0">● Security Score</text>
+        <text x="0" y="25">● Severity Charts</text>
+        <text x="0" y="50">● Findings Table</text>
+        <text x="0" y="75">● Evidence Drill-down</text>
+        <text x="0" y="100">● Event Trace</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(50, 560)" font-family="Inter, sans-serif" font-size="12" fill="#64748b">
+    <text x="0" y="0">▲ Solid arrows = Main pipeline flow</text>
+    <text x="350" y="0">▬ Dashed lines = Component connections</text>
+    <text x="750" y="0">🟦 Cyan highlight = Critical security steps</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="600" y="590" font-family="Inter, sans-serif" font-size="11" fill="#475569" text-anchor="middle">
+    AgentSec — Break your AI agent before a real attacker does
+  </text>
+</svg>
