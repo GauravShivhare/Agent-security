@@ -438,8 +438,6 @@ pytest tests/ -v
 pytest tests/ --cov=agentsec --cov-report=html
 ```
 
-![Run Artifacts Structure](assets/artifacts.png)
-
 ## 🎯 MITRE ATT&CK Mapping
 
 All 13 built-in attacks are mapped to MITRE ATT&CK tactics and techniques:
