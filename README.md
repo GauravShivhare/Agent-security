@@ -23,6 +23,14 @@ AgentSec is an open-source defensive security-testing framework for AI agents. I
 - **Compliance Reports** — `agentsec compliance` maps findings to SOC2, ISO27001, PCI DSS, OWASP LLM
 - **Agent-First Design** — AGENTS.md + 4 Skills for coding agents (Claude Code, Cursor, Codex)
 - **Run Artifacts** — Organized `agentsec_runs/` directories with per-scan outputs
+- **MITRE ATT&CK Mapping** — All 13 attacks tagged with tactics/techniques (T1566.001, T1059.001, T1027, T1068, T1552.001, T1505.003, etc.)
+- **Specialist Agents** — 4 domain experts: PromptInjection, ToolAbuse, SecretLeakage, Memory with knowledge packs
+- **Engagement Config (OPPLAN)** — Rules of Engagement, scope, objectives, tool/domain allowlists in `agentsec.yaml`
+- **Offensive Vaccine** — `agentsec vaccinate` attack→fix→verify cycle (3 iterations max)
+- **Knowledge Graph** — Neo4j + in-memory fallback for attack paths, blast radius, tool stats, MITRE mapping
+- **Security Pipeline** — GitHub Actions: CodeQL + Semgrep + Trivy + TruffleHog + Dependency Review + AgentSec
+- **Semgrep Custom Rules** — 25 repo-specific rules for AgentSec invariants (`.semgrep/agentsec-rules.yml`)
+- **Extended Categories** — DATA_DESTRUCTION, FINANCIAL_FRAUD attack categories
 - **Extensible Architecture** — Clean interfaces for custom adapters and attack packs
 
 ## 🏗️ Architecture
@@ -91,6 +99,7 @@ agentsec scan examples/vulnerable_agent
 | `agentsec validate` | Validate an attack definition file |
 | `agentsec autofix` | Generate code-level fix suggestions from scan report |
 | `agentsec compliance` | Generate compliance report (SOC2, ISO27001, PCI DSS, OWASP LLM) |
+| `agentsec vaccinate` | Run Offensive Vaccine cycle: attack → fix → verify |
 
 ## 🎯 Example Scan Output
 
@@ -429,13 +438,191 @@ pytest tests/ -v
 pytest tests/ --cov=agentsec --cov-report=html
 ```
 
-## 🗺️ Roadmap
+![Run Artifacts Structure](assets/artifacts.png)
+
+## 🎯 MITRE ATT&CK Mapping
+
+All 13 built-in attacks are mapped to MITRE ATT&CK tactics and techniques:
+
+| Attack | Tactics | Techniques |
+|--------|---------|------------|
+| Indirect Prompt Injection | Initial Access, Execution, Collection, Exfiltration | T1566.001, T1059.001, T1560.001, T1041 |
+| Direct Prompt Injection | Initial Access, Execution, Impact | T1566.002, T1059.001, T1485 |
+| Encoding Obfuscation | Defense Evasion, Execution | T1027, T1027.001 |
+| Social Engineering Roleplay | Initial Access, Credential Access, Impact | T1566.001, T1556.002, T1657 |
+| Tool Abuse — API Access | Privilege Escalation, Credential Access, Collection, Exfiltration | T1068, T1552.001, T1213.003, T1041 |
+| Tool Abuse — File Read | Credential Access, Discovery, Collection, Exfiltration | T1552.001, T1083, T1005, T1041 |
+| Tool Abuse — SQL Injection | Credential Access, Discovery, Collection, Impact | T1003, T1590.005, T1213.002, T1485 |
+| Secret Leakage — Tool Args | Credential Access, Collection, Exfiltration | T1552.001, T1530, T1041, T1567.002 |
+| Secret Leakage — Env Vars | Credential Access, Discovery, Credential Access, Exfiltration | T1552.001, T1082, T1552.004, T1041 |
+| Secret Leakage — PII | Collection, Exfiltration, Impact | T1213.003, T1041, T1567.002, T1657 |
+| Memory Poisoning | Persistence, Privilege Escalation, Credential Access, Defense Evasion | T1505.003, T1556.002, T1552.001, T1562.001 |
+| Context Overflow | Defense Evasion, Collection, Discovery | T1562.001, T1005, T1590.005 |
+| Conversation Hijacking | Persistence, Privilege Escalation, Defense Evasion, Credential Access | T1505.003, T1068, T1562.001, T1556.002 |
+
+This enables threat modeling, compliance reporting, and executive communication using industry-standard terminology.
+
+## 🤖 Specialist Agents
+
+AgentSec includes 4 domain-specialist agents (inspired by Decepticon's kill-chain specialists):
+
+| Specialist | Categories | Knowledge Packs |
+|------------|------------|-----------------|
+| **PromptInjectionSpecialist** | `prompt_injection` | injection_patterns, encoding_bypasses, context_stuffing |
+| **ToolAbuseSpecialist** | `tool_abuse` | tool_schemas, permission_models, injection_vectors |
+| **SecretLeakageSpecialist** | `secret_leakage` | credential_exposure, pii_exfiltration, environment_isolation |
+| **MemorySpecialist** | `memory` | persistent_injection, context_overflow, conversation_hijacking |
+
+Each specialist has:
+- **Knowledge packs** with MITRE techniques, attack patterns, and tool expertise
+- **System prompts** tailored to their domain
+- **Analysis methods** for findings with severity assessment and remediation priority
+- **Cross-specialist insights** detecting attack chains (e.g., prompt_injection → tool_abuse → secret_leakage)
+
+## ⚙️ Engagement Config (OPPLAN-Style)
+
+Configure professional Rules of Engagement in `agentsec.yaml`:
+
+```yaml
+engagement:
+  name: "Q3-2026-AgentSec-Assessment"
+  description: "AI Agent Security Assessment"
+  scope:
+    include: ["production-agent", "staging-agent"]
+    exclude: ["payment-service"]
+  rules_of_engagement:
+    - "No destructive actions (file deletion, data modification, service disruption)"
+    - "No external network calls to unauthorized destinations"
+    - "No credential harvesting from production systems"
+    - "Respect rate limits and avoid denial of service"
+    - "All findings reported with evidence and remediation"
+  objectives:
+    - "Identify prompt injection vulnerabilities"
+    - "Validate tool permission boundaries"
+    - "Test secret handling and isolation"
+    - "Verify memory isolation across sessions"
+  max_requests_per_attack: 100
+  max_total_requests: 5000
+  allowed_tools: ["send_email", "read_file", "query_database"]
+  denied_tools: ["delete_file", "execute_command", "admin_panel"]
+  allowed_domains: ["company.example", "api.company.example"]
+  denied_domains: ["attacker.example", "malicious.com"]
+```
+
+This brings professional red team discipline to AI agent testing.
+
+## 💉 Offensive Vaccine (Attack → Fix → Verify)
+
+Automated remediation verification cycle:
+
+```bash
+# Run vaccine cycle (max 3 iterations)
+agentsec vaccinate examples/vulnerable_agent --max-iterations 3
+
+# Custom output
+agentsec vaccinate ./my_agent -i 5 -o vaccine-report.md
+
+# Without auto-fix generation
+agentsec vaccinate ./my_agent --no-auto-fix
+```
+
+**Cycle:** Scan → Generate fixes → Apply manually → Re-scan → Repeat until clean or max iterations.
+
+Outputs per-iteration fix reports (`vaccinate-report.iter1.md`, etc.) and final summary.
+
+## 🧠 Knowledge Graph (Neo4j + In-Memory)
+
+Findings stored as a graph for attack path analysis:
+
+```python
+from agentsec.engine import get_knowledge_graph
+
+kg = get_knowledge_graph()  # Neo4j if available, else in-memory
+kg.import_scan_report(scan_report)
+
+# Find attack chains
+paths = kg.get_attack_paths(target_name="vulnerable-agent")
+# → prompt_injection → tool_abuse → secret_leakage
+
+# Blast radius
+radius = kg.get_blast_radius("indirect_prompt_injection_001")
+
+# Tool usage stats
+stats = kg.get_tool_usage_stats()
+
+# MITRE technique mapping
+findings = kg.get_findings_by_technique("T1566.001")
+```
+
+**Neo4j backend** for production, **in-memory fallback** for CI/testing.
+
+## 🛡️ Security Pipeline (GitHub Actions)
+
+6-tool parallel pipeline in `.github/workflows/agentsec.yml`:
+
+| Tool | Purpose | SARIF Category |
+|------|---------|----------------|
+| **CodeQL** | Deep SAST (Python + JS/TS) | codeql |
+| **Semgrep** | Custom repo rules (hard gate on ERROR) | semgrep |
+| **Trivy FS** | Dependency CVEs | trivy-fs |
+| **Trivy Config** | Dockerfile/IaC misconfig | trivy-config |
+| **TruffleHog** | Verified secrets only | trufflehog |
+| **Dependency Review** | PR dependency vulnerabilities | dependency-review |
+| **AgentSec** | Dynamic AI agent scan | agentsec |
+
+All findings land in GitHub Security tab as SARIF. PR comments with summary. Security gate job requires all checks pass.
+
+## 🔍 Semgrep Custom Rules (`.semgrep/agentsec-rules.yml`)
+
+25 repo-specific rules for AgentSec invariants:
+
+| Rule | Severity | Purpose |
+|------|----------|---------|
+| `agentsec-no-hardcoded-llm-key` | ERROR | Prevent hardcoded API keys |
+| `agentsec-no-hardcoded-secrets` | ERROR | Prevent hardcoded passwords/tokens |
+| `agentsec-no-unverified-tool-call` | ERROR | Enforce tool argument validation |
+| `agentsec-no-raw-env-access` | ERROR | Enforce secrets manager usage |
+| `agentsec-attack-missing-mitre` | WARNING | Require MITRE ATT&CK mapping |
+| `agentsec-adapter-no-schema-validation` | WARNING | Require tool schema validation |
+| `agentsec-ci-permissions-minimal` | WARNING | Enforce minimal GH Actions permissions |
+| `agentsec-no-eval-exec` | ERROR | Block eval/exec |
+| `agentsec-no-shell-injection` | ERROR | Block shell=True |
+| `agentsec-no-sql-concat` | ERROR | Enforce parameterized queries |
+
+Run: `semgrep scan --config=.semgrep/agentsec-rules.yml --error`
+
+## 🏗️ Project Structure (Updated)
+
+```
+agentsec/
+├── AGENTS.md               # Agent guide for coding agents
+├── skills/                 # Skills for coding agents
+├── src/agentsec/           # Core package
+│   ├── engine/             # Runner, orchestrator, sandbox, parallel, artifacts
+│   │   ├── specialists.py  # 4 specialist agents
+│   │   ├── knowledge_graph.py  # Neo4j + in-memory graph
+│   │   └── ...
+│   ├── evaluate/
+│   │   ├── autofix.py      # Auto-fix engine
+│   │   └── ...
+│   └── ...
+├── attacks/                # 13 attacks with MITRE ATT&CK tags
+├── .semgrep/agentsec-rules.yml  # 25 custom Semgrep rules
+├── .github/workflows/      # 6-tool security pipeline
+├── .semgrep/               # Custom Semgrep rules
+├── skills/                 # 4 agent skills
+├── assets/                 # README images
+└── docs/                   # Architecture diagrams
+```
+
+## 🗺️ Roadmap (Updated)
 
 - **v0.1** — CLI, adapters, sandbox, 13 attacks, tracing, evaluator, reports, dashboard, mutation, policies ✅
 - **v0.2** — Auto-fix engine, compliance reports, agent-first skills, parallel execution, run artifacts ✅
-- **v0.3** — GitHub Action PR annotations, config file, baseline/diff mode
-- **v0.4** — MCP security pack, tool permission analysis, memory attacks
-- **v0.5** — Multi-agent scenarios, attack-path graph
+- **v0.3** — MITRE ATT&CK mapping, specialist agents, engagement config, offensive vaccine, knowledge graph, security pipeline, Semgrep rules ✅
+- **v0.4** — GitHub Action PR annotations, config file, baseline/diff mode
+- **v0.5** — MCP security pack, tool permission analysis, memory attacks
+- **v0.6** — Multi-agent scenarios, attack-path graph
 - **v1.0** — Hosted dashboard, team history, policy management, enterprise integrations
 
 ## 🤝 Contributing
