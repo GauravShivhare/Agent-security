@@ -10,6 +10,7 @@ from agentsec.engine.runner import AttackRunner
 from agentsec.observe.tracer import EventTracer
 from agentsec.reporting.json_report import JSONReporter
 from agentsec.reporting.terminal import TerminalReporter
+from agentsec.reporting.sarif import SARIFReporter
 
 
 @dataclass
@@ -121,7 +122,11 @@ class Orchestrator:
             reporter.generate(self.config.target_name, attack_results, summary)
             self.console.print_report_path(self.config.output_json)
 
-        # TODO: SARIF report
+        # Generate SARIF report
+        if self.config.output_sarif:
+            reporter = SARIFReporter(self.config.output_sarif)
+            reporter.generate(self.config.target_name, attack_results)
+            self.console.print_report_path(self.config.output_sarif)
 
         # Determine exit code
         exit_code = self._determine_exit_code(summary)
