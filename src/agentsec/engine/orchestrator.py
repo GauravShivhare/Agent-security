@@ -11,6 +11,7 @@ from agentsec.observe.tracer import EventTracer
 from agentsec.reporting.json_report import JSONReporter
 from agentsec.reporting.terminal import TerminalReporter
 from agentsec.reporting.sarif import SARIFReporter
+from agentsec.evaluate.policy import PolicyEngine
 
 
 @dataclass
@@ -25,6 +26,8 @@ class ScanConfig:
     output_json: str | None = None
     output_sarif: str | None = None
     sandbox: bool = False
+    policy_dir: str | None = None
+    fail_on_policy: bool = False
 
 
 @dataclass
@@ -110,8 +113,52 @@ class Orchestrator:
                 verbose=self.config.verbose,
             )
 
+        # Policy evaluation
+        policy_results = []
+        if self.config.policy_dir:
+            try:
+                engine = PolicyEngine(self.config.policy_dir)
+                all_events = []
+                for ar in attack_results:
+                    all_events.extend(ar.get("events", []))
+                
+                policy_result = engine.evaluate(
+                    all_events,
+                    attack_id=None,  # Overall policy check
+                    target_metadata=self.target.get_metadata() if hasattr(self.target, "get_metadata") else {},
+                )
+                policy_results.append({
+                    "policy_dir": self.config.policy_dir,
+                    "passed": policy_result.passed,
+                    "violations": policy_result.violations,
+                    "warnings": policy_result.warnings,
+                })
+                
+                # Print policy results
+                if policy_result.violations:
+                    self.console.print(f"\n[bold red]Policy Violations ({len(policy_result.violations)}):[/bold red]")
+                    for v in policy_result.violations:
+                        self.console.print(f"  [{v['severity'].upper()}] {v['message']} (rule: {v.get('rule', 'unknown')})")
+                if policy_result.warnings:
+                    self.console.print(f"\n[bold yellow]Policy Warnings ({len(policy_result.warnings)}):[/bold yellow]")
+                    for w in policy_result.warnings:
+                        self.console.print(f"  [{w['severity'].upper()}] {w['message']} (rule: {w.get('rule', 'unknown')})")
+                if policy_result.passed and not policy_result.warnings:
+                    self.console.print("\n[green]✓ All policies passed[/green]")
+                    
+            except Exception as e:
+                self.console.print_warning(f"Policy evaluation failed: {e}")
+
         # Build summary
         summary = JSONReporter.build_summary(attack_results)
+        
+        # Add policy summary
+        if policy_results:
+            total_violations = sum(len(p["violations"]) for p in policy_results)
+            total_warnings = sum(len(p["warnings"]) for p in policy_results)
+            summary["policy_violations"] = total_violations
+            summary["policy_warnings"] = total_warnings
+            summary["policy_passed"] = all(p["passed"] for p in policy_results)
 
         # Print summary
         self.console.print_summary(summary)
@@ -140,9 +187,11 @@ class Orchestrator:
 
     def _determine_exit_code(self, summary: dict[str, Any]) -> int:
         """Determine exit code based on fail-on threshold."""
-        if summary["failed"] == 0:
+        # Check attack failures
+        if summary["failed"] == 0 and summary.get("policy_violations", 0) == 0:
             return 0
 
+        # Check attack severity
         fail_on = self.config.fail_on.lower()
         severity_order = {"critical": 4, "high": 3, "medium": 2, "low": 1, "info": 0}
         threshold = severity_order.get(fail_on, 3)
@@ -152,4 +201,11 @@ class Orchestrator:
             if count > 0:
                 max_severity_found = max(max_severity_found, severity_order.get(sev, 0))
 
-        return 1 if max_severity_found >= threshold else 0
+        attack_fail = max_severity_found >= threshold
+
+        # Check policy violations
+        policy_fail = False
+        if self.config.fail_on_policy and summary.get("policy_violations", 0) > 0:
+            policy_fail = True
+
+        return 1 if (attack_fail or policy_fail) else 0

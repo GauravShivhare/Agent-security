@@ -83,6 +83,10 @@ def main():
 @click.option("--sandbox", is_flag=True, help="Run in Docker sandbox")
 @click.option("--sandbox-image", default="python:3.11-slim",
               help="Docker image for sandbox")
+@click.option("--policy-dir", type=click.Path(path_type=Path, exists=True),
+              help="Directory with OPA/Rego policy files")
+@click.option("--fail-on-policy", is_flag=True,
+              help="Fail scan if policy violations found")
 def scan(
     target_path: Path | None,
     config: Path,
@@ -96,6 +100,8 @@ def scan(
     output_sarif: Path | None,
     sandbox: bool,
     sandbox_image: str,
+    policy_dir: Path | None,
+    fail_on_policy: bool,
 ):
     """Scan a target agent for vulnerabilities."""
     # Load configuration
@@ -146,6 +152,8 @@ def scan(
         output_json=cfg.scan.output_json,
         output_sarif=cfg.scan.output_sarif,
         sandbox=sandbox,
+        policy_dir=str(policy_dir) if policy_dir else None,
+        fail_on_policy=fail_on_policy,
     )
 
     reporter = TerminalReporter(console)
@@ -578,6 +586,18 @@ def mutate(attack_id: str, output_dir: Path, max_variants: int, seed: int | None
         table.add_row(f"... and {len(variants) - 20} more", "", "")
 
     console.print(table)
+
+
+@main.command()
+@click.option("--output-dir", "-o", type=click.Path(path_type=Path), default="policies",
+              help="Output directory for policy files")
+def policy_init(output_dir: Path):
+    """Create default OPA/Rego policy files."""
+    from agentsec.evaluate.policy import create_default_policies
+    create_default_policies(output_dir)
+    console.print(f"[green]✓[/green] Created default policies in {output_dir}/")
+    console.print("\nTo use policies, run:")
+    console.print(f"  agentsec scan examples/vulnerable_agent --policy-dir {output_dir} --fail-on-policy")
 
 
 if __name__ == "__main__":
