@@ -19,6 +19,10 @@ AgentSec is an open-source defensive security-testing framework for AI agents. I
 - **Attack Mutation Engine** — Generate 50+ variants per attack (encoding, obfuscation, roleplay, emotional)
 - **Policy-as-Code (OPA/Rego)** — Custom security rules with `--fail-on-policy`
 - **Local Web Dashboard** — `agentsec serve` for interactive charts, filtering, evidence drill-down
+- **Auto-Fix Suggestions** — `agentsec autofix` generates code-level remediation for findings
+- **Compliance Reports** — `agentsec compliance` maps findings to SOC2, ISO27001, PCI DSS, OWASP LLM
+- **Agent-First Design** — AGENTS.md + 4 Skills for coding agents (Claude Code, Cursor, Codex)
+- **Run Artifacts** — Organized `agentsec_runs/` directories with per-scan outputs
 - **Extensible Architecture** — Clean interfaces for custom adapters and attack packs
 
 ## 🏗️ Architecture
@@ -85,6 +89,8 @@ agentsec scan examples/vulnerable_agent
 | `agentsec policy-init` | Create default OPA/Rego policy files |
 | `agentsec serve` | Start local web dashboard for viewing scan results |
 | `agentsec validate` | Validate an attack definition file |
+| `agentsec autofix` | Generate code-level fix suggestions from scan report |
+| `agentsec compliance` | Generate compliance report (SOC2, ISO27001, PCI DSS, OWASP LLM) |
 
 ## 🎯 Example Scan Output
 
@@ -175,19 +181,105 @@ Default policies included:
 - **Injection prevention** — SQL injection, path traversal
 - **Secret protection** — API keys in tool args, env var access
 
+## 🔧 Auto-Fix Suggestions
+
+Generate code-level remediation for security findings:
+
+```bash
+# Run scan with JSON output
+agentsec scan examples/vulnerable_agent --output-json report.json
+
+# Generate fix suggestions
+agentsec autofix report.json --output agentsec-fixes.md
+```
+
+The auto-fix engine analyzes findings and provides:
+- **Input sanitization** for prompt injection
+- **Tool permission scoping** for tool abuse
+- **Environment isolation** for secret leakage
+- **Session isolation & context limits** for memory attacks
+- **File-specific code examples** with before/after patterns
+
+## 📋 Compliance Reports
+
+Generate auditor-ready compliance reports:
+
+```bash
+# Generate compliance report for all frameworks
+agentsec compliance report.json --output compliance-report.md
+
+# Specific frameworks only
+agentsec compliance report.json -f SOC2 -f ISO27001 -f PCI_DSS -f OWASP_LLM
+```
+
+Supported frameworks:
+- **SOC 2 Type II** — CC6.1, CC6.3, CC6.6, CC6.7, CC7.1, CC7.2, CC7.3
+- **ISO/IEC 27001:2022** — A.8.2.3, A.9.4.4, A.10.1.1, A.12.4.1, A.13.2.1, A.14.2.5, A.16.1.4
+- **PCI DSS v4.0** — 3.4, 6.5.1, 6.5.3, 6.5.7, 6.5.8, 7.1.1, 8.2.1
+- **OWASP Top 10 for LLM** — LLM01, LLM02, LLM06, LLM07
+
+Output includes executive summary, control violation tables, and remediation references.
+
+## 🤖 Agent-First Design (AGENTS.md + Skills)
+
+AgentSec is designed for **coding agents** (Claude Code, Cursor, Codex) to discover and use automatically:
+
+```bash
+# Install AgentSec skills for your coding agent
+npx skills add GauravShivhare/Agent-security
+```
+
+This installs 4 skills:
+- **security-scanning-with-agentsec** — Run scans and read results
+- **fix-agent-vulnerabilities** — Remediate findings and re-scan
+- **ci-agent-security-setup** — Add PR scanning to CI/CD
+- **agent-attack-authoring** — Write custom attack definitions
+
+Also includes `AGENTS.md` with:
+- Quick start for agents
+- Exit codes and artifact locations
+- Custom attack writing guide
+- Adapter development guide
+- Project layout reference
+
+## 📁 Run Artifacts
+
+Every scan creates an organized artifact directory:
+
+```
+agentsec_runs/
+├── 20260821_143000/
+│   ├── report.json          # Full JSON report
+│   ├── report.sarif         # SARIF 2.1.0 for CI
+│   ├── report.md            # Markdown summary
+│   ├── vulnerabilities/     # Per-finding detail files
+│   │   ├── indirect_prompt_injection_001.md
+│   │   └── ...
+│   └── run.json             # Metadata (duration, score, exit code)
+└── latest -> 20260821_143000  # Symlink to latest run
+```
+
+Access latest run artifacts with `agentsec_runs/latest/`.
+
 ## 🏗️ Project Structure
 
 ```
 agentsec/
+├── AGENTS.md               # Agent guide for coding agents
+├── skills/                 # Skills for coding agents
+│   ├── security-scanning-with-agentsec/
+│   ├── fix-agent-vulnerabilities/
+│   ├── ci-agent-security-setup/
+│   └── agent-attack-authoring/
 ├── src/agentsec/           # Core package
-│   ├── cli.py              # CLI entry point
+│   ├── cli.py              # CLI entry point (9 commands)
 │   ├── config.py           # Configuration management
 │   ├── adapters/           # Target agent adapters
 │   ├── attacks/            # Attack definitions & registry
-│   ├── engine/             # Runner, orchestrator, sandbox
+│   ├── engine/             # Runner, orchestrator, sandbox, parallel, artifacts
 │   ├── observe/            # Event tracing
-│   ├── evaluate/           # Success, impact, policy evaluation
-│   └── reporting/          # JSON, terminal, SARIF reports
+│   ├── evaluate/           # Success, impact, policy, autofix evaluation
+│   └── reporting/          # JSON, terminal, SARIF, compliance reports
 ├── attacks/                # Built-in attack library (13 attacks)
 │   ├── prompt-injection/   # 4 attacks
 │   ├── tool-abuse/         # 3 attacks
@@ -198,7 +290,9 @@ agentsec/
 ├── tests/                  # Unit tests (19 passing)
 ├── docker/                 # Sandbox Dockerfile
 ├── .github/workflows/      # CI/CD integration
-└── policies/               # OPA/Rego policies (optional)
+├── policies/               # OPA/Rego policies (optional)
+├── assets/                 # README images
+└── docs/                   # Architecture diagrams
 ```
 
 ## 📝 Writing Attacks
@@ -330,9 +424,9 @@ pytest tests/ --cov=agentsec --cov-report=html
 ## 🗺️ Roadmap
 
 - **v0.1** — CLI, adapters, sandbox, 13 attacks, tracing, evaluator, reports, dashboard, mutation, policies ✅
-- **v0.2** — GitHub Action PR annotations, config file, baseline/diff mode
-- **v0.3** — MCP security pack, tool permission analysis, memory attacks
-- **v0.4** — Attack mutation engine, regression corpus
+- **v0.2** — Auto-fix engine, compliance reports, agent-first skills, parallel execution, run artifacts ✅
+- **v0.3** — GitHub Action PR annotations, config file, baseline/diff mode
+- **v0.4** — MCP security pack, tool permission analysis, memory attacks
 - **v0.5** — Multi-agent scenarios, attack-path graph
 - **v1.0** — Hosted dashboard, team history, policy management, enterprise integrations
 
