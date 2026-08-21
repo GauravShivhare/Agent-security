@@ -289,7 +289,7 @@ agentsec/
 │   ├── ci-agent-security-setup/
 │   └── agent-attack-authoring/
 ├── src/agentsec/           # Core package
-│   ├── cli.py              # CLI entry point (9 commands)
+│   ├── cli.py              # CLI entry point (10 commands)
 │   ├── config.py           # Configuration management
 │   ├── adapters/           # Target agent adapters
 │   ├── attacks/            # Attack definitions & registry
@@ -590,30 +590,6 @@ All findings land in GitHub Security tab as SARIF. PR comments with summary. Sec
 | `agentsec-no-sql-concat` | ERROR | Enforce parameterized queries |
 
 Run: `semgrep scan --config=.semgrep/agentsec-rules.yml --error`
-
-## 🏗️ Project Structure (Updated)
-
-```
-agentsec/
-├── AGENTS.md               # Agent guide for coding agents
-├── skills/                 # Skills for coding agents
-├── src/agentsec/           # Core package
-│   ├── engine/             # Runner, orchestrator, sandbox, parallel, artifacts
-│   │   ├── specialists.py  # 4 specialist agents
-│   │   ├── knowledge_graph.py  # Neo4j + in-memory graph
-│   │   └── ...
-│   ├── evaluate/
-│   │   ├── autofix.py      # Auto-fix engine
-│   │   └── ...
-│   └── ...
-├── attacks/                # 13 attacks with MITRE ATT&CK tags
-├── .semgrep/agentsec-rules.yml  # 25 custom Semgrep rules
-├── .github/workflows/      # 6-tool security pipeline
-├── .semgrep/               # Custom Semgrep rules
-├── skills/                 # 4 agent skills
-├── assets/                 # README images
-└── docs/                   # Architecture diagrams
-```
 
 ## 🗺️ Roadmap (Updated)
 
