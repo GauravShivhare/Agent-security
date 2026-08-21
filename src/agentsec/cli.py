@@ -538,5 +538,47 @@ def list_attacks():
     console.print(table)
 
 
+@main.command()
+@click.option("--attack-id", required=True, help="Attack ID to mutate")
+@click.option("--output-dir", "-o", type=click.Path(path_type=Path), default="mutations",
+              help="Output directory for generated variants")
+@click.option("--max-variants", "-n", default=20, help="Maximum variants to generate")
+@click.option("--seed", type=int, help="Random seed for reproducibility")
+def mutate(attack_id: str, output_dir: Path, max_variants: int, seed: int | None):
+    """Generate mutated variants of an attack."""
+    from agentsec.attacks import AttackLoader, AttackRegistry, MutationConfig
+    from agentsec.attacks.mutation import generate_mutation_corpus
+
+    # Load the base attack
+    registry = load_attacks(["attacks"])
+    attack = registry.get(attack_id)
+    if not attack:
+        console.print(f"[red]Attack not found: {attack_id}[/red]")
+        sys.exit(1)
+
+    console.print(f"[bold]Mutating attack:[/bold] {attack.id} — {attack.name}")
+
+    config = MutationConfig(max_variants=max_variants, seed=seed)
+    variants = generate_mutation_corpus([attack], config, str(output_dir))
+
+    console.print(f"[green]✓[/green] Generated {len(variants)} variants in {output_dir}/")
+
+    # Show summary
+    table = Table(title="Generated Variants")
+    table.add_column("ID", style="cyan")
+    table.add_column("Type", style="magenta")
+    table.add_column("Severity", style="red")
+
+    for v in variants[:20]:  # Show first 20
+        mut_type = v.payload.metadata.get("mutation_type", "unknown")
+        sev_color = {"critical": "red", "high": "magenta", "medium": "yellow", "low": "blue", "info": "dim"}.get(v.severity.value, "white")
+        table.add_row(v.id, mut_type, f"[{sev_color}]{v.severity.value.upper()}[/{sev_color}]")
+
+    if len(variants) > 20:
+        table.add_row(f"... and {len(variants) - 20} more", "", "")
+
+    console.print(table)
+
+
 if __name__ == "__main__":
     main()

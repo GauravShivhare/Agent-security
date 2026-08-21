@@ -10,6 +10,7 @@ from agentsec.attacks.models import (
     SuccessCondition,
     ExpectedImpact,
 )
+from agentsec.attacks.mutation import AttackMutator, MutationConfig, generate_mutation_corpus
 
 __all__ = [
     "AttackLoader",
@@ -21,4 +22,7 @@ __all__ = [
     "Payload",
     "SuccessCondition",
     "ExpectedImpact",
+    "AttackMutator",
+    "MutationConfig",
+    "generate_mutation_corpus",
 ]
