@@ -611,5 +611,85 @@ def serve(host: str, port: int, report: Path | None, no_browser: bool):
     run_dashboard(host, port, str(report) if report else None, no_browser)
 
 
+@main.command()
+@click.argument("report_file", type=click.Path(exists=True, path_type=Path))
+@click.option("--output", "-o", type=click.Path(path_type=Path), default=None,
+              help="Output markdown file (default: agentsec-fixes.md)")
+def autofix(report_file: Path, output: Path | None):
+    """Generate remediation suggestions from a scan report.
+
+    Reads a JSON scan report and produces a markdown file with
+    code-level fix suggestions for each finding.
+    """
+    import json
+    from agentsec.evaluate.autofix import AutoFixEngine
+
+    with open(report_file, encoding="utf-8") as f:
+        scan_report = json.load(f)
+
+    engine = AutoFixEngine()
+    out_path = output or Path("agentsec-fixes.md")
+    md = engine.generate_fix_report(scan_report, out_path)
+
+    console.print(f"[green]✓[/green] Auto-fix report generated: {out_path}")
+
+    # Show summary
+    findings = scan_report.get("findings", [])
+    if findings:
+        console.print(f"\n[bold]Findings analyzed:[/bold] {len(findings)}")
+        for f in findings:
+            sev = f.get("severity", "unknown")
+            sev_color = {"critical": "red", "high": "magenta", "medium": "yellow", "low": "blue"}.get(sev, "white")
+            console.print(f"  [{sev_color}]{sev.upper()}[/{sev_color}] {f.get('attack_id', '?')} — {f.get('attack_name', '?')}")
+
+    console.print(f"\nOpen {out_path} for code-level fix suggestions.")
+
+
+@main.command()
+@click.argument("report_file", type=click.Path(exists=True, path_type=Path))
+@click.option("--output", "-o", type=click.Path(path_type=Path), default=None,
+              help="Output compliance report file (default: compliance-report.md)")
+@click.option("--frameworks", "-f", multiple=True,
+              type=click.Choice(["SOC2", "ISO27001", "PCI_DSS", "OWASP_LLM"]),
+              default=["SOC2", "ISO27001", "PCI_DSS", "OWASP_LLM"],
+              help="Compliance frameworks to include")
+@click.option("--org", "--organization", default="Organization",
+              help="Organization name for the report")
+def compliance(report_file: Path, output: Path | None, frameworks: tuple[str], org: str):
+    """Generate a compliance-ready security report from a scan report.
+
+    Maps AgentSec findings to SOC2, ISO 27001, PCI DSS, and OWASP LLM controls.
+    Produces a markdown report suitable for auditors and security teams.
+    """
+    import json as _json
+    from agentsec.reporting.compliance import ComplianceReporter
+
+    with open(report_file, encoding="utf-8") as f:
+        scan_report = _json.load(f)
+
+    reporter = ComplianceReporter()
+    out_path = output or Path("compliance-report.md")
+
+    md = reporter.generate_markdown(
+        scan_report=scan_report,
+        frameworks=list(frameworks),
+        organization=org,
+        output_path=out_path,
+    )
+
+    # Summary
+    data = reporter.generate(scan_report, list(frameworks), org)
+    console.print(f"[green]✓[/green] Compliance report generated: {out_path}")
+    console.print(f"\n[bold]Risk Level:[/bold] {data['summary']['risk_level']}")
+    console.print(f"[bold]Total Control Violations:[/bold] {data['summary']['total_control_violations']}")
+
+    for fw in data["frameworks_covered"]:
+        status_color = "red" if fw["violations"] else "green"
+        status_icon = "❌" if fw["violations"] else "✅"
+        console.print(f"  {status_icon} [{status_color}]{fw['name']}[/{status_color}]: {len(fw['controls_violated'])} violations")
+
+    console.print(f"\nOpen {out_path} for the full compliance report.")
+
+
 if __name__ == "__main__":
     main()
