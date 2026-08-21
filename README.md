@@ -1,5 +1,7 @@
 # AgentSec — AI Agent Security Testing Framework
 
+![AgentSec Banner](assets/banner.png)
+
 > **Break your AI agent before a real attacker does.**
 
 AgentSec is an open-source defensive security-testing framework for AI agents. It lets developers run controlled adversarial tests against their agents in a sandbox, observe what the agent does, determine whether an attack succeeded, quantify impact, and produce machine-readable and human-readable reports.
@@ -86,7 +88,7 @@ agentsec scan examples/vulnerable_agent
 
 ## 🎯 Example Scan Output
 
-```
+```bash
 AgentSec
 --------
 Target: vulnerable-agent
@@ -113,6 +115,8 @@ Report: ./agentsec-report.json
 Exit code: 1 (failures detected)
 ```
 
+![Terminal Demo](assets/terminal-demo.png)
+
 ## 🌐 Local Web Dashboard
 
 Start an interactive dashboard to explore results:
@@ -122,7 +126,7 @@ agentsec scan examples/vulnerable_agent --output-json report.json
 agentsec serve --report report.json --no-browser
 ```
 
-![AgentSec Dashboard](docs/architecture.png)
+![Web Dashboard](assets/dashboard.png)
 
 Dashboard features:
 - Summary cards (total, passed, failed, policy violations/warnings)
@@ -132,6 +136,8 @@ Dashboard features:
 - Clickable attack detail modal with evidence, impact rationale, event trace
 
 > **Architecture Diagram**: See [docs/architecture.html](docs/architecture.html) for an interactive architecture visualization, or [docs/architecture.mermaid](docs/architecture.mermaid) for the Mermaid source.
+
+![Architecture Diagram](assets/architecture.png)
 
 ## 🧬 Attack Mutation Engine
 
@@ -149,6 +155,8 @@ Mutation strategies:
 - **Roleplay**: security auditor, system admin, compliance officer personas
 - **Emotional manipulation**: urgency, desperation, authority
 - **Combined**: encoding + context stuffing
+
+![Attack Example](assets/attack-example.png)
 
 ## 🛡️ Policy-as-Code (OPA/Rego)
 
