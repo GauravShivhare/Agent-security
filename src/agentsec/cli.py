@@ -600,5 +600,16 @@ def policy_init(output_dir: Path):
     console.print(f"  agentsec scan examples/vulnerable_agent --policy-dir {output_dir} --fail-on-policy")
 
 
+@main.command()
+@click.option("--host", default="127.0.0.1", help="Host to bind to")
+@click.option("--port", "-p", default=8080, help="Port to bind to")
+@click.option("--report", "-r", type=click.Path(path_type=Path), help="Path to scan report JSON")
+@click.option("--no-browser", is_flag=True, help="Don't open browser automatically")
+def serve(host: str, port: int, report: Path | None, no_browser: bool):
+    """Start local web dashboard for viewing scan results."""
+    from agentsec.dashboard import run_dashboard
+    run_dashboard(host, port, str(report) if report else None, no_browser)
+
+
 if __name__ == "__main__":
     main()
