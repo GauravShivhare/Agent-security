@@ -18,6 +18,15 @@ from agentsec.engine.specialists import (
     get_specialist_names,
     analyze_findings_with_specialists,
 )
+from agentsec.engine.knowledge_graph import (
+    KnowledgeGraph,
+    InMemoryKnowledgeGraph,
+    FindingNode,
+    ToolNode,
+    DataNode,
+    AttackPath,
+    get_knowledge_graph,
+)
 
 __all__ = [
     "Sandbox",
@@ -42,4 +51,11 @@ __all__ = [
     "get_all_specialists",
     "get_specialist_names",
     "analyze_findings_with_specialists",
+    "KnowledgeGraph",
+    "InMemoryKnowledgeGraph",
+    "FindingNode",
+    "ToolNode",
+    "DataNode",
+    "AttackPath",
+    "get_knowledge_graph",
 ]
