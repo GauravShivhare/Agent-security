@@ -566,3 +566,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 ## ⭐ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=GauravShivhare/Agent-security&type=Date)](https://star-history.com/#GauravShivhare/Agent-security&Date)
+
+## Security reporting
+
+Found a potential vulnerability? Please read [SECURITY.md](SECURITY.md) before opening an issue. Avoid publishing credentials, private data, or working exploit details in public issues.
