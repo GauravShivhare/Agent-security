@@ -6,6 +6,16 @@
 
 ---
 
+**AgentSec is an open-source defensive testing framework for AI agents.** Start with the built-in vulnerable demo, inspect evidence from adversarial tests, and use the findings to harden tool permissions and data boundaries.
+
+[Quick start](#-quick-start-2-minutes) · [Report a finding](https://github.com/GauravShivhare/Agent-security/issues/new) · [Contribute](CONTRIBUTING.md)
+
+| Status | What to expect |
+| --- | --- |
+| **Current focus** | Reliable local scans, structured attacks, evidence, reports, policy checks, and CI workflows |
+| **Best first step** | Run the built-in vulnerable-agent quick start and inspect the generated report |
+| **Experimental or evolving** | Advanced adapters, compliance mappings, auto-fix, vaccine cycles, and knowledge-graph analysis |
+
 ## 🤔 What is AgentSec?
 
 AgentSec is a **security testing framework for AI agents** — think of it like a penetration testing tool, but specifically designed for LLM-powered agents that can use tools, access APIs, read files, and maintain memory.
@@ -54,7 +64,7 @@ agentsec scan examples/vulnerable_agent
 #    Found: 1 CRITICAL vulnerability (indirect prompt injection)
 ```
 
-**That's it!** You'll see a beautiful terminal report showing exactly what the agent did wrong, with evidence and a security score.
+**That's it!** You should see a terminal report showing what the agent did wrong, with evidence and a security score. If the quick start does not work in your environment, please [open an issue](https://github.com/GauravShivhare/Agent-security/issues/new) with your Python version and command output.
 
 ---
 
