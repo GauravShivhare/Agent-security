@@ -214,7 +214,7 @@ jobs:
       - name: Run AgentSec scan
         id: agentsec
         run: |
-          agentsec scan examples/vulnerable_agent --fail-on high --output-json agentsec-report.json --output-sarif agentsec-report.sarif || true
+          agentsec scan ci/vulnerable_agent --fail-on high --output-json agentsec-report.json --output-sarif agentsec-report.sarif || true
           echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
 
       - name: Upload JSON report artifact
@@ -269,11 +269,9 @@ jobs:
           sarif_file: agentsec-report.sarif
           category: agentsec
 
-      - name: Fail job if vulnerabilities found
+      - name: Report demo findings without failing pipeline
         if: ${{ steps.agentsec.outputs.exit_code == '1' }}
-        run: |
-          echo "::error::AgentSec scan found vulnerabilities above threshold"
-          exit 1
+        run: echo "::notice::The built-in demo target reported expected vulnerabilities; review the uploaded report."
 
   # ════════════════════════════════════════════════════════════════════════
   # Summary: Security Gate
