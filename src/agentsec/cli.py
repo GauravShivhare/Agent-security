@@ -10,6 +10,7 @@ from rich.table import Table
 
 from agentsec.adapters.base import AgentTarget
 from agentsec.adapters.custom import CustomAdapter
+from agentsec.adapters.http import HttpAdapter
 from agentsec.attacks.registry import AttackLoader, AttackRegistry
 from agentsec.config import AgentSecConfig, AdapterConfig
 from agentsec.engine.orchestrator import Orchestrator, ScanConfig
@@ -28,8 +29,11 @@ def load_adapter(config: AdapterConfig) -> AgentTarget:
             "Use 'agentsec init' to create a starter project."
         )
     elif config.type == "http":
-        # TODO: HTTP adapter
-        raise click.ClickException("HTTP adapter not yet implemented")
+        args = dict(config.args)
+        base_url = args.pop("base_url", None)
+        if not base_url:
+            raise click.ClickException("HTTP adapter requires target.args.base_url")
+        return HttpAdapter(base_url=base_url, **args)
     else:
         raise click.ClickException(f"Unknown adapter type: {config.type}")
 

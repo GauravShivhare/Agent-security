@@ -18,20 +18,32 @@ class HttpAdapter(AgentTarget):
         api_key: str | None = None,
         timeout: float = 30.0,
         headers: dict[str, str] | None = None,
+        endpoints: dict[str, str] | None = None,
     ):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self._headers = headers or {}
+        self._headers = dict(headers or {})
+        self._endpoints = {
+            "chat": "/chat",
+            "tools": "/tools",
+            "reset": "/reset",
+            **(endpoints or {}),
+        }
         if api_key:
             self._headers["Authorization"] = f"Bearer {api_key}"
         self._client = httpx.Client(timeout=timeout, headers=self._headers)
         self._events: list[dict[str, Any]] = []
 
+    def _url(self, endpoint: str) -> str:
+        """Build a URL from a configured endpoint path."""
+        path = self._endpoints[endpoint]
+        return f"{self.base_url}/{path.lstrip('/')}"
+
     def send(self, input: str) -> str:
         start = time.time()
         try:
             response = self._client.post(
-                f"{self.base_url}/chat",
+                self._url("chat"),
                 json={"input": input},
             )
             response.raise_for_status()
@@ -51,7 +63,7 @@ class HttpAdapter(AgentTarget):
 
     def list_tools(self) -> list[dict[str, Any]]:
         try:
-            response = self._client.get(f"{self.base_url}/tools")
+            response = self._client.get(self._url("tools"))
             response.raise_for_status()
             return response.json()
         except Exception:
@@ -59,7 +71,7 @@ class HttpAdapter(AgentTarget):
 
     def reset(self) -> None:
         try:
-            self._client.post(f"{self.base_url}/reset")
+            self._client.post(self._url("reset"))
         except Exception:
             pass
         self._events.clear()
