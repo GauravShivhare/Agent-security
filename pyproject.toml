@@ -16,7 +16,8 @@ dependencies = [
     "rich>=13.0",
     "docker>=7.0",
     "jsonschema>=4.20",
-]
+    "httpx>=0.25",
+    ]
 
 [project.optional-dependencies]
 dev = [
