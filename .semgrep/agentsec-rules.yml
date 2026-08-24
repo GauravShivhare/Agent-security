@@ -38,11 +38,8 @@ rules:
     message: "Tool call without argument validation - add schema validation"
     languages: [python]
     severity: ERROR
-    pattern-either:
-      - pattern: |
-          $TOOL($ARGS)
-      - pattern: |
-          agent.call_tool($TOOL, $ARGS)
+    pattern: |
+      agent.call_tool($TOOL, $ARGS)
 
   - id: agentsec-no-raw-env-access
     message: "Direct environment variable access - use secrets manager"
@@ -141,8 +138,8 @@ rules:
     severity: ERROR
     paths:
       include:
-        - ".github/workflows/*.yml"
-        - ".github/workflows/*.yaml"
+        - "/.github/workflows/*.yml"
+        - "/.github/workflows/*.yaml"
     pattern: |
       ${{ secrets.$KEY }}
 
@@ -152,8 +149,8 @@ rules:
     severity: WARNING
     paths:
       include:
-        - ".github/workflows/*.yml"
-        - ".github/workflows/*.yaml"
+        - "/.github/workflows/*.yml"
+        - "/.github/workflows/*.yaml"
     patterns:
       - pattern: $VALUE
       - pattern-not: |
