@@ -141,7 +141,7 @@ jobs:
           path: ./
           base: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
           head: ${{ github.event.pull_request.head.sha || github.sha }}
-          extra_args: --only-verified --sarif --sarif-output=trufflehog.sarif
+          extra_args: "--only-verified --sarif > trufflehog.sarif"
       - name: Upload TruffleHog SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
