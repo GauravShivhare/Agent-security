@@ -69,10 +69,8 @@ rules:
     message: "Attack definition missing MITRE ATT&CK mapping"
     languages: [yaml]
     severity: WARNING
-    pattern:
-      not:
-        pattern: |
-          mitre_attack:
+    pattern-not: |
+      mitre_attack:
     paths:
       include:
         - "attacks/**/*.yaml"
@@ -81,10 +79,8 @@ rules:
     message: "Attack definition should have descriptive tags"
     languages: [yaml]
     severity: WARNING
-    pattern:
-      not:
-        pattern: |
-          tags:
+    pattern-not: |
+      tags:
     paths:
       include:
         - "attacks/**/*.yaml"
@@ -93,13 +89,11 @@ rules:
     message: "Attack severity should match expected impact max_severity"
     languages: [yaml]
     severity: WARNING
-    pattern:
-      not:
-        pattern: |
-          severity: $SEV
-          ...
-          expected_impact:
-            max_severity: $SEV
+    pattern-not: |
+      severity: $SEV
+      ...
+      expected_impact:
+        max_severity: $SEV
     paths:
       include:
         - "attacks/**/*.yaml"
@@ -123,10 +117,8 @@ rules:
     message: "Adapter missing reset function - required for test isolation"
     languages: [python]
     severity: WARNING
-    pattern:
-      not:
-        pattern: |
-          def reset():
+    pattern-not: |
+      def reset():
     paths:
       include:
         - "examples/**/*.py"
@@ -158,12 +150,10 @@ rules:
       include:
         - ".github/workflows/*.yml"
         - ".github/workflows/*.yaml"
-    pattern:
-      not:
-        pattern: |
-          permissions:
-            contents: read
-            security-events: write
+    pattern-not: |
+      permissions:
+        contents: read
+        security-events: write
 
   # ──────────────────────────────────────────────────────────────────────────────
   # General Security Hygiene

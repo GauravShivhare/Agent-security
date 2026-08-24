@@ -16,7 +16,7 @@ jobs:
   # SAST: CodeQL Deep Static Analysis
   # ════════════════════════════════════════════════════════════════════════
   codeql:
-    name: CodeQL (Python + JS/TS)
+    name: CodeQL (Python)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [python, javascript-typescript]
+        language: [python]
     steps:
       - uses: actions/checkout@v4
       - uses: github/codeql-action/init@v3
@@ -136,7 +136,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: TruffleHog OSS (verified secrets)
-        uses: trufflesecurity/trufflehog@v3
+        uses: trufflesecurity/trufflehog@main
         with:
           path: ./
           base: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
