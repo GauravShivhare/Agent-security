@@ -136,12 +136,17 @@ jobs:
         with:
           fetch-depth: 0
       - name: TruffleHog OSS (verified secrets)
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
-          head: ${{ github.event.pull_request.head.sha || github.sha }}
-          extra_args: "--only-verified --sarif > trufflehog.sarif"
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          docker run --rm -v "$PWD:/tmp" -w /tmp \
+            ghcr.io/trufflesecurity/trufflehog:latest \
+            git file:///tmp/ \
+            --since-commit "${BASE:-}" \
+            --branch "${HEAD:-}" \
+            --fail --no-update --github-actions --only-verified --sarif \
+            > trufflehog.sarif
       - name: Upload TruffleHog SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
@@ -164,10 +169,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Probe dependency graph availability
         id: depgraph
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          if gh api "repos/${GITHUB_REPOSITORY}/dependency-graph/compare/${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" --silent 2>/dev/null; then
+          if GH_TOKEN="${{ github.token }}" gh api "repos/${GITHUB_REPOSITORY}/dependency-graph/compare/${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" --silent 2>/dev/null; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
