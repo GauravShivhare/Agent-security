@@ -143,12 +143,8 @@ rules:
       include:
         - ".github/workflows/*.yml"
         - ".github/workflows/*.yaml"
-    pattern-either:
-      - pattern: |
-          env:
-            $KEY: $VALUE
-      - pattern: |
-          ${{ secrets.$KEY }}
+    pattern: |
+      ${{ secrets.$KEY }}
 
   - id: agentsec-ci-permissions-minimal
     message: "GitHub Actions should use minimal permissions"

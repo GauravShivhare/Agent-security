@@ -145,7 +145,7 @@ jobs:
             git file:///tmp/ \
             --since-commit "${BASE:-}" \
             --branch "${HEAD:-}" \
-            --fail --no-update --github-actions --only-verified --sarif \
+            --fail --no-update --only-verified --sarif \
             > trufflehog.sarif
       - name: Upload TruffleHog SARIF
         if: always()
