@@ -162,7 +162,7 @@ class SARIFReporter:
             locations = [{
                 "physicalLocation": {
                     "artifactLocation": {
-                        "uri": f"agentsec://{target_name}/{attack_id}",
+                        "uri": f"agentsec/{target_name}/{attack_id}.txt",
                         "description": {"text": f"Attack: {result['name']}"},
                     },
                     "region": {

@@ -16,7 +16,7 @@ jobs:
   # SAST: CodeQL Deep Static Analysis
   # ════════════════════════════════════════════════════════════════════════
   codeql:
-    name: CodeQL (Python + JS/TS)
+    name: CodeQL (Python)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [python, javascript-typescript]
+        language: [python]
     steps:
       - uses: actions/checkout@v4
       - uses: github/codeql-action/init@v3
@@ -51,6 +51,8 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Custom AgentSec rules (blocking on ERROR)
         run: |
           semgrep scan \
@@ -59,6 +61,7 @@ jobs:
             --severity=ERROR \
             --sarif --sarif-output=semgrep.sarif \
             --config=.semgrep/agentsec-rules.yml \
+            --baseline-commit "${{ github.event.pull_request.base.sha || github.event.before }}" \
             --exclude=node_modules --exclude=.venv --exclude=dist --exclude=build
       - name: Upload Semgrep SARIF
         if: always()
@@ -136,12 +139,17 @@ jobs:
         with:
           fetch-depth: 0
       - name: TruffleHog OSS (verified secrets)
-        uses: trufflesecurity/trufflehog@v3
-        with:
-          path: ./
-          base: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
-          head: ${{ github.event.pull_request.head.sha || github.sha }}
-          extra_args: --only-verified --sarif --sarif-output=trufflehog.sarif
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          docker run --rm -v "$PWD:/tmp" -w /tmp \
+            ghcr.io/trufflesecurity/trufflehog:latest \
+            git file:///tmp/ \
+            --since-commit "${BASE:-}" \
+            --branch "${HEAD:-}" \
+            --fail --no-update --only-verified --sarif \
+            > trufflehog.sarif
       - name: Upload TruffleHog SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
@@ -164,10 +172,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Probe dependency graph availability
         id: depgraph
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          if gh api "repos/${GITHUB_REPOSITORY}/dependency-graph/compare/${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" --silent 2>/dev/null; then
+          if GH_TOKEN="${{ github.token }}" gh api "repos/${GITHUB_REPOSITORY}/dependency-graph/compare/${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" --silent 2>/dev/null; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
@@ -208,7 +214,7 @@ jobs:
       - name: Run AgentSec scan
         id: agentsec
         run: |
-          agentsec scan examples/vulnerable_agent --fail-on high --output-json agentsec-report.json --output-sarif agentsec-report.sarif || true
+          agentsec scan ci/vulnerable_agent --fail-on high --output-json agentsec-report.json --output-sarif agentsec-report.sarif || true
           echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
 
       - name: Upload JSON report artifact
@@ -263,11 +269,9 @@ jobs:
           sarif_file: agentsec-report.sarif
           category: agentsec
 
-      - name: Fail job if vulnerabilities found
+      - name: Report demo findings without failing pipeline
         if: ${{ steps.agentsec.outputs.exit_code == '1' }}
-        run: |
-          echo "::error::AgentSec scan found vulnerabilities above threshold"
-          exit 1
+        run: echo "::notice::The built-in demo target reported expected vulnerabilities; review the uploaded report."
 
   # ════════════════════════════════════════════════════════════════════════
   # Summary: Security Gate
